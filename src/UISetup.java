@@ -1,8 +1,17 @@
 import java.awt.*;
+import java.awt.event.*;
+
 import javax.swing.*;
+
+import resources.IconLoader;
 
 public class UISetup {
 	public static Color defaultColor;
+	public static ImageIcon scoreEmptyIcon;
+
+	private static JFrame mainFrame;
+	private static JPanel mainPanel;
+	private static JPanel gameBoardPanel;
 
 	public UISetup() {
 		try {
@@ -12,11 +21,13 @@ public class UISetup {
 			e.printStackTrace();
 		}
 
-		var mainFrame = new JFrame();
+		IconLoader.Load();
+
+		mainFrame = new JFrame();
 		mainFrame.setTitle("Minesweeper");
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setResizable(false);
-		mainFrame.setSize(320, 320);
+		mainFrame.getRootPane().setBorder(BorderFactory.createRaisedBevelBorder());
 
 		mainFrame.add(setupMainPanel());
 
@@ -25,23 +36,13 @@ public class UISetup {
 	}
 
 	public static JPanel setupMainPanel() {
-		var mainPanel = new JPanel();
-		mainPanel.setBorder(BorderFactory.createRaisedBevelBorder());
+		mainPanel = new JPanel();
+		mainPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
-		var layoutConstraints = new GridBagConstraints();
-
-		layoutConstraints.gridx = 0;
-		layoutConstraints.gridy = 0;
-		mainPanel.add(setupMenuBar(), layoutConstraints);
-
-		layoutConstraints.gridx = 0;
-		layoutConstraints.gridy = 1;
-		mainPanel.add(setupMainUIPanel(), layoutConstraints);
-
-		layoutConstraints.gridx = 0;
-		layoutConstraints.gridy = 2;
-		mainPanel.add(setupGameBoardPanel(), layoutConstraints);
+		mainPanel.add(setupMenuBar());
+		mainPanel.add(setupMainUIPanel());
+		mainPanel.add(setupGameBoardPanel());
 
 		return mainPanel;
 	}
@@ -50,27 +51,54 @@ public class UISetup {
 		var menuBarPanel = new JPanel();
 		menuBarPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-		var difficultyButton = new JButton("Difficulty");
-		difficultyButton.setBorder(BorderFactory.createEmptyBorder(3, 8, 2, 8));
-		difficultyButton.setBackground(defaultColor);
-		menuBarPanel.add(difficultyButton);
+		var difficultyMenuBar = new JMenuBar();
+		difficultyMenuBar.setBorder(BorderFactory.createEmptyBorder(3, -6, 2, -6));
+		difficultyMenuBar.setBackground(defaultColor);
+		difficultyMenuBar.add(setupDifficultyMenu());
+		menuBarPanel.add(difficultyMenuBar);
 
 		var scoreBoardButton = new JButton("Score Board");
-		scoreBoardButton.setBorder(BorderFactory.createEmptyBorder(3, 8, 2, 8));
+		scoreBoardButton.addActionListener(UISetup::setupScoreBoardDialog);
+		scoreBoardButton.setBorder(BorderFactory.createEmptyBorder(3, 0, 2, 0));
 		scoreBoardButton.setBackground(defaultColor);
 		menuBarPanel.add(scoreBoardButton);
 
 		return menuBarPanel;
 	}
 
+	public static JMenu setupDifficultyMenu() {
+		var difficultyMenu = new JMenu("Difficulty");
+
+		var beginnerMenuItem = new JMenuItem("Beginner");
+		beginnerMenuItem.addActionListener(changeDifficulty(GameState::setAsBeginner));
+		difficultyMenu.add(beginnerMenuItem);
+
+		var intermediateMenuItem = new JMenuItem("Intermediate");
+		intermediateMenuItem.addActionListener(changeDifficulty(GameState::setAsIntermediate));
+		difficultyMenu.add(intermediateMenuItem);
+
+		var expertMenuItem = new JMenuItem("Expert");
+		expertMenuItem.addActionListener(changeDifficulty(GameState::setAsExpert));
+		difficultyMenu.add(expertMenuItem);
+
+		return difficultyMenu;
+	}
+
 	public static JPanel setupMainUIPanel() {
 		var mainUIPanel = new JPanel();
 		mainUIPanel.setBorder(BorderFactory.createLoweredBevelBorder());
+		mainUIPanel.setLayout(new BoxLayout(mainUIPanel, BoxLayout.X_AXIS));
 
 		mainUIPanel.add(setupTimeUIPanel());
+		mainUIPanel.add(Box.createHorizontalGlue());
 
-		var resetButton = new JButton("Reset");
+		var resetButton = new JButton();
+		resetButton.setPreferredSize(new Dimension(24, 24));
+		resetButton.setBorder(BorderFactory.createEmptyBorder());
+		resetButton.setBackground(defaultColor);
+		resetButton.setIcon(IconLoader.resetDefaultIcon);
 		mainUIPanel.add(resetButton);
+		mainUIPanel.add(Box.createHorizontalGlue());
 
 		mainUIPanel.add(setupMinesUIPanel());
 
@@ -79,48 +107,58 @@ public class UISetup {
 
 	public static JPanel setupTimeUIPanel() {
 		var timeUIPanel = new JPanel();
-		timeUIPanel.setLayout(new BoxLayout(timeUIPanel, BoxLayout.Y_AXIS));
+		timeUIPanel.setLayout(new BoxLayout(timeUIPanel, BoxLayout.X_AXIS));
 
-		var timeLabel = new JLabel("Time Elapsed");
-		timeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-		timeUIPanel.add(timeLabel);
-
-		var timeCountLabel = new JLabel("10");
-		timeCountLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-		timeUIPanel.add(timeCountLabel);
+		timeUIPanel.add(new JLabel(IconLoader.scoreEmptyIcon));
+		timeUIPanel.add(new JLabel(IconLoader.scoreEmptyIcon));
+		timeUIPanel.add(new JLabel(IconLoader.scoreEmptyIcon));
 
 		return timeUIPanel;
 	}
 
 	public static JPanel setupMinesUIPanel() {
 		var minesUIPanel = new JPanel();
-		minesUIPanel.setLayout(new BoxLayout(minesUIPanel, BoxLayout.Y_AXIS));
+		minesUIPanel.setLayout(new BoxLayout(minesUIPanel, BoxLayout.X_AXIS));
 
-		var minesLabel = new JLabel("Mines Remaining");
-		minesLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-		minesUIPanel.add(minesLabel);
-
-		var minesCountLabel = new JLabel("10");
-		minesCountLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-		minesUIPanel.add(minesCountLabel);
+		minesUIPanel.add(new JLabel(IconLoader.scoreEmptyIcon));
+		minesUIPanel.add(new JLabel(IconLoader.scoreEmptyIcon));
+		minesUIPanel.add(new JLabel(IconLoader.scoreEmptyIcon));
 
 		return minesUIPanel;
 	}
 
 	public static JPanel setupGameBoardPanel() {
-		var gameBoardPanel = new JPanel();
+		var state = GameState.current;
+		gameBoardPanel = new JPanel();
 		gameBoardPanel.setBorder(BorderFactory.createLoweredBevelBorder());
-		gameBoardPanel.setLayout(new GridLayout(10, 10));
+		gameBoardPanel.setLayout(new GridLayout(state.height, state.width));
 
-		var buttonBorder = BorderFactory.createRaisedBevelBorder();
-		for (int i = 0; i < 10; i++) {
-			for (int j = 0; j < 10; j++) {
+		var buttonBorder = BorderFactory.createEmptyBorder();
+		var buttonDimension = new Dimension(16, 16);
+		for (int i = 0; i < state.height; i++) {
+			for (int j = 0; j < state.width; j++) {
 				var mineButton = new JButton();
+				mineButton.setPreferredSize(buttonDimension);
 				mineButton.setBorder(buttonBorder);
+				mineButton.setBackground(defaultColor);
+				mineButton.setIcon(IconLoader.boardDefaultIcon);
 				gameBoardPanel.add(mineButton);
 			}
 		}
 
 		return gameBoardPanel;
+	}
+
+	public static void setupScoreBoardDialog(ActionEvent e) {
+		JOptionPane.showMessageDialog(mainFrame, "Hello?", "Score Board", JOptionPane.PLAIN_MESSAGE);
+	}
+
+	public static ActionListener changeDifficulty(Runnable runnable) {
+		return e -> {
+			mainPanel.remove(gameBoardPanel);
+			runnable.run();
+			mainPanel.add(setupGameBoardPanel());
+			mainFrame.pack();
+		};
 	}
 }
