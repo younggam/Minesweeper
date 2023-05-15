@@ -70,15 +70,15 @@ public class UISetup {
 		var difficultyMenu = new JMenu("Difficulty");
 
 		var beginnerMenuItem = new JMenuItem("Beginner");
-		beginnerMenuItem.addActionListener(changeDifficulty(GameState::setAsBeginner));
+		beginnerMenuItem.addActionListener(changeDifficulty(DifficultyPreset::setAsBeginner));
 		difficultyMenu.add(beginnerMenuItem);
 
 		var intermediateMenuItem = new JMenuItem("Intermediate");
-		intermediateMenuItem.addActionListener(changeDifficulty(GameState::setAsIntermediate));
+		intermediateMenuItem.addActionListener(changeDifficulty(DifficultyPreset::setAsIntermediate));
 		difficultyMenu.add(intermediateMenuItem);
 
 		var expertMenuItem = new JMenuItem("Expert");
-		expertMenuItem.addActionListener(changeDifficulty(GameState::setAsExpert));
+		expertMenuItem.addActionListener(changeDifficulty(DifficultyPreset::setAsExpert));
 		difficultyMenu.add(expertMenuItem);
 
 		return difficultyMenu;
@@ -128,7 +128,7 @@ public class UISetup {
 	}
 
 	public static JPanel setupGameBoardPanel() {
-		var state = GameState.current;
+		var state = DifficultyPreset.current;
 		gameBoardPanel = new JPanel();
 		gameBoardPanel.setBorder(BorderFactory.createLoweredBevelBorder());
 		gameBoardPanel.setLayout(new GridLayout(state.height, state.width));
