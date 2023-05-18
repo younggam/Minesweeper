@@ -6,12 +6,15 @@ import resources.IconLoader;
 
 public class MineAction implements MouseListener {
 	private final JButton button;
+	private final int row, column;
 
 	private boolean flagged;
 
-	public MineAction(JButton button) {
+	public MineAction(JButton button, int row, int column) {
 		button.setIcon(IconLoader.boardDefaultIcon);
 		this.button = button;
+		this.row = row;
+		this.column = column;
 	}
 
 	@Override
@@ -53,7 +56,7 @@ public class MineAction implements MouseListener {
 	}
 
 	private void chording() {
-
+		// foreachMineAdjacent
 	}
 
 	private void flag() {

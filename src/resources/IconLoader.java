@@ -15,7 +15,6 @@ public class IconLoader {
 	public static ImageIcon resetWinIcon;
 	public static ImageIcon resetLoseIcon;
 
-	public static ImageIcon scoreEmptyIcon;
 	public static ImageIcon[] scoreNumberIcons = new ImageIcon[10];
 
 	public static void Load() {
@@ -37,6 +36,5 @@ public class IconLoader {
 
 		for (int i = 0; i < 10; i++)
 			scoreNumberIcons[i] = new ImageIcon(c.getResource("score/Score " + i + ".png"));
-		scoreEmptyIcon = new ImageIcon(c.getResource("score/Score Empty.png"));
 	}
 }

@@ -5,15 +5,17 @@ import javax.swing.*;
 
 import resources.IconLoader;
 
-public class UISetup {
+public class SetupUI {
 	public static Color defaultColor;
 
 	private static JFrame mainFrame;
 	private static JPanel mainPanel;
+	private static ScoreUI timeUIPanel;
+	private static JButton resetButton;
+	private static ScoreUI minesUIPanel;
 	private static JPanel gameBoardPanel;
-	private static JButton[][] mineButtons;
 
-	public UISetup() {
+	public SetupUI() {
 		try {
 			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 			defaultColor = new Color(UIManager.getColor("control").getRGB());
@@ -58,7 +60,7 @@ public class UISetup {
 		menuBarPanel.add(difficultyMenuBar);
 
 		var scoreBoardButton = new JButton("Score Board");
-		scoreBoardButton.addActionListener(UISetup::setupScoreBoardDialog);
+		scoreBoardButton.addActionListener(SetupUI::setupScoreBoardDialog);
 		scoreBoardButton.setBorder(BorderFactory.createEmptyBorder(3, 0, 2, 0));
 		scoreBoardButton.setBackground(defaultColor);
 		menuBarPanel.add(scoreBoardButton);
@@ -89,45 +91,24 @@ public class UISetup {
 		mainUIPanel.setBorder(BorderFactory.createLoweredBevelBorder());
 		mainUIPanel.setLayout(new BoxLayout(mainUIPanel, BoxLayout.X_AXIS));
 
-		mainUIPanel.add(setupTimeUIPanel());
+		minesUIPanel = new ScoreUI();
+		mainUIPanel.add(minesUIPanel);
 
 		mainUIPanel.add(Box.createHorizontalGlue());
 
-		var resetButton = new JButton();
+		resetButton = new JButton();
 		resetButton.setPreferredSize(new Dimension(24, 24));
 		resetButton.setBorder(BorderFactory.createEmptyBorder());
 		resetButton.setBackground(defaultColor);
-		resetButton.setIcon(IconLoader.resetDefaultIcon);
-		resetButton.setPressedIcon(IconLoader.resetPressedIcon);
+		initializeReset();
 		mainUIPanel.add(resetButton);
 
 		mainUIPanel.add(Box.createHorizontalGlue());
 
-		mainUIPanel.add(setupMinesUIPanel());
+		timeUIPanel = new ScoreUI();
+		mainUIPanel.add(timeUIPanel);
 
 		return mainUIPanel;
-	}
-
-	public static JPanel setupTimeUIPanel() {
-		var timeUIPanel = new JPanel();
-		timeUIPanel.setLayout(new BoxLayout(timeUIPanel, BoxLayout.X_AXIS));
-
-		timeUIPanel.add(new JLabel(IconLoader.scoreEmptyIcon));
-		timeUIPanel.add(new JLabel(IconLoader.scoreEmptyIcon));
-		timeUIPanel.add(new JLabel(IconLoader.scoreEmptyIcon));
-
-		return timeUIPanel;
-	}
-
-	public static JPanel setupMinesUIPanel() {
-		var minesUIPanel = new JPanel();
-		minesUIPanel.setLayout(new BoxLayout(minesUIPanel, BoxLayout.X_AXIS));
-
-		minesUIPanel.add(new JLabel(IconLoader.scoreEmptyIcon));
-		minesUIPanel.add(new JLabel(IconLoader.scoreEmptyIcon));
-		minesUIPanel.add(new JLabel(IconLoader.scoreEmptyIcon));
-
-		return minesUIPanel;
 	}
 
 	public static JPanel setupGameBoardPanel() {
@@ -137,18 +118,16 @@ public class UISetup {
 		gameBoardPanel.setBorder(BorderFactory.createLoweredBevelBorder());
 		gameBoardPanel.setLayout(new GridLayout(state.height, state.width));
 
-		mineButtons = new JButton[state.height][state.width];
 		var buttonBorder = BorderFactory.createEmptyBorder();
 		var buttonDimension = new Dimension(16, 16);
 		for (int i = 0; i < state.height; i++) {
 			for (int j = 0; j < state.width; j++) {
 				var mineButton = new JButton();
-				var mineAction = new MineAction(mineButton);
+				var mineAction = new MineAction(mineButton, i, j);
 				mineButton.addMouseListener(mineAction);
 				mineButton.setPreferredSize(buttonDimension);
 				mineButton.setBorder(buttonBorder);
 				mineButton.setBackground(defaultColor);
-				mineButtons[i][j] = mineButton;
 				gameBoardPanel.add(mineButton);
 			}
 		}
@@ -169,8 +148,25 @@ public class UISetup {
 			mainFrame.pack();
 		};
 	}
-	
-	public static void forEachMineButtons() {
-		
+
+	public static void updateMines(int mines) {
+		minesUIPanel.update(mines);
+	}
+
+	public static void updateTime(float time) {
+		timeUIPanel.update((int) time);
+	}
+
+	public static void initializeReset() {
+		resetButton.setIcon(IconLoader.resetDefaultIcon);
+		resetButton.setPressedIcon(IconLoader.resetPressedIcon);
+	}
+
+	public static void gameReset(boolean win) {
+		if (win)
+			resetButton.setIcon(IconLoader.resetWinIcon);
+		else
+			resetButton.setIcon(IconLoader.resetLoseIcon);
+
 	}
 }
