@@ -7,11 +7,11 @@ import resources.IconLoader;
 
 public class UISetup {
 	public static Color defaultColor;
-	public static ImageIcon scoreEmptyIcon;
 
 	private static JFrame mainFrame;
 	private static JPanel mainPanel;
 	private static JPanel gameBoardPanel;
+	private static JButton[][] mineButtons;
 
 	public UISetup() {
 		try {
@@ -90,6 +90,7 @@ public class UISetup {
 		mainUIPanel.setLayout(new BoxLayout(mainUIPanel, BoxLayout.X_AXIS));
 
 		mainUIPanel.add(setupTimeUIPanel());
+
 		mainUIPanel.add(Box.createHorizontalGlue());
 
 		var resetButton = new JButton();
@@ -97,7 +98,9 @@ public class UISetup {
 		resetButton.setBorder(BorderFactory.createEmptyBorder());
 		resetButton.setBackground(defaultColor);
 		resetButton.setIcon(IconLoader.resetDefaultIcon);
+		resetButton.setPressedIcon(IconLoader.resetPressedIcon);
 		mainUIPanel.add(resetButton);
+
 		mainUIPanel.add(Box.createHorizontalGlue());
 
 		mainUIPanel.add(setupMinesUIPanel());
@@ -129,19 +132,23 @@ public class UISetup {
 
 	public static JPanel setupGameBoardPanel() {
 		var state = DifficultyPreset.current;
+
 		gameBoardPanel = new JPanel();
 		gameBoardPanel.setBorder(BorderFactory.createLoweredBevelBorder());
 		gameBoardPanel.setLayout(new GridLayout(state.height, state.width));
 
+		mineButtons = new JButton[state.height][state.width];
 		var buttonBorder = BorderFactory.createEmptyBorder();
 		var buttonDimension = new Dimension(16, 16);
 		for (int i = 0; i < state.height; i++) {
 			for (int j = 0; j < state.width; j++) {
 				var mineButton = new JButton();
+				var mineAction = new MineAction(mineButton);
+				mineButton.addMouseListener(mineAction);
 				mineButton.setPreferredSize(buttonDimension);
 				mineButton.setBorder(buttonBorder);
 				mineButton.setBackground(defaultColor);
-				mineButton.setIcon(IconLoader.boardDefaultIcon);
+				mineButtons[i][j] = mineButton;
 				gameBoardPanel.add(mineButton);
 			}
 		}
@@ -157,8 +164,13 @@ public class UISetup {
 		return e -> {
 			mainPanel.remove(gameBoardPanel);
 			runnable.run();
+			GameState.initialize(DifficultyPreset.current.width, DifficultyPreset.current.height);
 			mainPanel.add(setupGameBoardPanel());
 			mainFrame.pack();
 		};
+	}
+	
+	public static void forEachMineButtons() {
+		
 	}
 }

@@ -7,8 +7,6 @@ public class IconLoader {
 	public static ImageIcon boardDefaultIcon;
 	public static ImageIcon boardPressedIcon;
 	public static ImageIcon boardFlagIcon;
-	public static ImageIcon boardQuestionIcon;
-	public static ImageIcon boardQuestionPressedIcon;
 	public static ImageIcon boardMineIcon;
 	public static ImageIcon boardMinePressedIcon;
 
@@ -29,8 +27,6 @@ public class IconLoader {
 		boardPressedIcon = new ImageIcon(c.getResource("board/Board Pressed.png"));
 		boardNumberIcons[0] = boardPressedIcon;
 		boardFlagIcon = new ImageIcon(c.getResource("board/Board Flag.png"));
-		boardQuestionIcon = new ImageIcon(c.getResource("board/Board Question.png"));
-		boardQuestionPressedIcon = new ImageIcon(c.getResource("board/Board Question Pressed.png"));
 		boardMineIcon = new ImageIcon(c.getResource("board/Board Mine.png"));
 		boardMinePressedIcon = new ImageIcon(c.getResource("board/Board Mine Pressed.png"));
 
