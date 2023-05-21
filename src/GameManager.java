@@ -12,6 +12,7 @@ public class GameManager {
 	private static float playTime;
 
 	private static boolean gameOver;
+	private static boolean isBoardInitialized;
 
 	public static void initialize(DifficultyPreset preset) {
 		rows = preset.rows; // 시작하기 전 생성자로 사이즈와 지뢰 개수 지정, 이걸로 난이도 조절 가능
@@ -23,13 +24,18 @@ public class GameManager {
 		flags = 0;
 		playTime = 0;
 		gameOver = false;
+		isBoardInitialized = false;
 
 		SetupUI.updateMines(mines);
 		SetupUI.updateTime(playTime);
 		SetupUI.initializeReset();
 
-		// 보드 초기화
-		initializeBoard(); // 일단 board 초기화
+		// 보드 초기화 (먼저 0으로 채우기)
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < columns; j++) {
+				board[i][j] = new Tile();
+			}
+		}
 	}
 
 	public static void subscribeTileActionReset(TileAction tileAction) {
@@ -42,16 +48,10 @@ public class GameManager {
 		return gameOver;
 	}
 
-	private static void initializeBoard() {
+	private static void initializeBoard(int excludedRow, int excludedCol) {
+		isBoardInitialized = true;
 		Random random = new Random(); // 랜덤 객체 생성
 		random.setSeed(System.currentTimeMillis()); // 시드 설정을 따로 하지 않음
-
-		// 보드 초기화 (먼저 0으로 채우기)
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < columns; j++) {
-				board[i][j] = new Tile();
-			}
-		}
 
 		// 지뢰 배치
 		int count = 0;
@@ -59,7 +59,7 @@ public class GameManager {
 		while (count < mines) {
 			int row = (int) (random.nextInt(rows));
 			int col = (int) (random.nextInt(columns));
-			if (!board[row][col].isMine()) {
+			if (row != excludedRow && col != excludedCol && !board[row][col].isMine()) {
 				board[row][col].SetMine();
 				count++;
 			}
@@ -90,6 +90,8 @@ public class GameManager {
 	}
 
 	public static void revealTile(int row, int col) {
+		if (!isBoardInitialized)
+			initializeBoard(row, col);
 		revealTileInner(row, col);
 
 		updateState();
@@ -109,11 +111,12 @@ public class GameManager {
 	}
 
 	private static boolean revealTileInner(int row, int col) {
-		if (row < 0 || row >= rows || col < 0 || col >= columns || board[row][col].isFound()) {
+		if (row < 0 || row >= rows || col < 0 || col >= columns) 
 			return false;
-		}
-
 		var tile = board[row][col];
+		if (tile.isFound() || tile.hasFlag())
+			return false;
+
 		founds++;
 		tile.setFound();
 		if (tile.isMine()) {

@@ -38,12 +38,11 @@ public class TileAction implements MouseListener {
 		case 1:
 			if (SwingUtilities.isRightMouseButton(e))
 				GameManager.setFlag(row, column);
-			else if (!tile.hasFlag())
+			else
 				GameManager.revealTile(row, column);
 			break;
 		case 2:
-			if (!tile.hasFlag())
-				GameManager.revealSurroundingTiles(row, column);
+			GameManager.revealSurroundingTiles(row, column);
 			break;
 		default:
 		}
