@@ -8,6 +8,8 @@ import resources.IconLoader;
 public class SetupUI {
 	public static Color defaultColor;
 
+	private static Consumer<TileAction> tileActionCons;
+
 	private static JFrame mainFrame;
 	private static JPanel mainPanel;
 	private static ScoreUI timeUIPanel;
@@ -15,7 +17,9 @@ public class SetupUI {
 	private static ScoreUI minesUIPanel;
 	private static JPanel gameBoardPanel;
 
-	public SetupUI() {
+	public static void initialize(Consumer<TileAction> tileActionCons) {
+		SetupUI.tileActionCons = tileActionCons;
+
 		try {
 			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 			defaultColor = new Color(UIManager.getColor("control").getRGB());
@@ -33,8 +37,8 @@ public class SetupUI {
 
 		mainFrame.add(setupMainPanel());
 
-		mainFrame.pack();
 		mainFrame.setVisible(true);
+		reset();
 	}
 
 	public static JPanel setupMainPanel() {
@@ -44,7 +48,6 @@ public class SetupUI {
 
 		mainPanel.add(setupMenuBar());
 		mainPanel.add(setupMainUIPanel());
-		mainPanel.add(setupGameBoardPanel());
 
 		return mainPanel;
 	}
@@ -97,6 +100,7 @@ public class SetupUI {
 		mainUIPanel.add(Box.createHorizontalGlue());
 
 		resetButton = new JButton();
+		resetButton.addActionListener(e -> reset());
 		resetButton.setPreferredSize(new Dimension(24, 24));
 		resetButton.setBorder(BorderFactory.createEmptyBorder());
 		resetButton.setBackground(defaultColor);
@@ -116,19 +120,20 @@ public class SetupUI {
 
 		gameBoardPanel = new JPanel();
 		gameBoardPanel.setBorder(BorderFactory.createLoweredBevelBorder());
-		gameBoardPanel.setLayout(new GridLayout(state.height, state.width));
+		gameBoardPanel.setLayout(new GridLayout(state.rows, state.columns));
 
 		var buttonBorder = BorderFactory.createEmptyBorder();
 		var buttonDimension = new Dimension(16, 16);
-		for (int i = 0; i < state.height; i++) {
-			for (int j = 0; j < state.width; j++) {
-				var mineButton = new JButton();
-				var mineAction = new MineAction(mineButton, i, j);
-				mineButton.addMouseListener(mineAction);
-				mineButton.setPreferredSize(buttonDimension);
-				mineButton.setBorder(buttonBorder);
-				mineButton.setBackground(defaultColor);
-				gameBoardPanel.add(mineButton);
+		for (int i = 0; i < state.rows; i++) {
+			for (int j = 0; j < state.columns; j++) {
+				var tileButton = new JButton();
+				var tileAction = new TileAction(tileButton, i, j);
+				tileActionCons.cons(tileAction);
+				tileButton.addMouseListener(tileAction);
+				tileButton.setPreferredSize(buttonDimension);
+				tileButton.setBorder(buttonBorder);
+				tileButton.setBackground(defaultColor);
+				gameBoardPanel.add(tileButton);
 			}
 		}
 
@@ -139,13 +144,18 @@ public class SetupUI {
 		JOptionPane.showMessageDialog(mainFrame, "Hello?", "Score Board", JOptionPane.PLAIN_MESSAGE);
 	}
 
+	public static void reset() {
+		if (gameBoardPanel != null)
+			mainPanel.remove(gameBoardPanel);
+		GameManager.initialize(DifficultyPreset.current);
+		mainPanel.add(setupGameBoardPanel());
+		mainFrame.pack();
+	}
+
 	public static ActionListener changeDifficulty(Runnable runnable) {
 		return e -> {
-			mainPanel.remove(gameBoardPanel);
 			runnable.run();
-			GameState.initialize(DifficultyPreset.current.width, DifficultyPreset.current.height);
-			mainPanel.add(setupGameBoardPanel());
-			mainFrame.pack();
+			reset();
 		};
 	}
 

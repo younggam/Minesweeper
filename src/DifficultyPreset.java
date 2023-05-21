@@ -5,13 +5,13 @@ public class DifficultyPreset {
 
 	public static DifficultyPreset current = Beginner;
 
-	public final int width;
-	public final int height;
+	public final int columns;
+	public final int rows;
 	public final int mines;
 
-	private DifficultyPreset(int width, int height, int mines) {
-		this.width = width;
-		this.height = height;
+	private DifficultyPreset(int columns, int rows, int mines) {
+		this.columns = columns;
+		this.rows = rows;
 		this.mines = mines;
 	}
 
