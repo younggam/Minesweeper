@@ -4,6 +4,8 @@ import javax.swing.*;
 
 import resources.IconLoader;
 
+// Tile과 보드에서 값들이 변했을 때, 맞춰서 UI에 반영시켜줌
+// 유저 상호작용을 Tile과 보드에 전해줌
 public class TileAction implements MouseListener {
 	private final JButton button;
 	private final int row, column;

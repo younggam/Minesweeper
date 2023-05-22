@@ -1,4 +1,4 @@
-
+// 보드의 한 부분, UI와의 연결점
 public class Tile {
 	private boolean mine;
 	private int adjacents;
