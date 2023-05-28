@@ -119,7 +119,7 @@ public class SetupUI {
 	}
 
 	public static JPanel setupGameBoardPanel() {
-		var state = DifficultyPreset.current;
+		var state = DifficultyPreset.current();
 
 		gameBoardPanel = new JPanel();
 		gameBoardPanel.setBorder(BorderFactory.createLoweredBevelBorder());
@@ -148,7 +148,7 @@ public class SetupUI {
 	public static void reset() {
 		if (gameBoardPanel != null)
 			mainPanel.remove(gameBoardPanel);
-		GameManager.initialize(DifficultyPreset.current);
+		GameManager.initialize(DifficultyPreset.current());
 		mainPanel.add(setupGameBoardPanel());
 		mainFrame.pack();
 	}
@@ -188,7 +188,7 @@ public class SetupUI {
 			beginnerPanel.add(new JLabel(beginnerScores[i]));
 		tabbedPane.addTab("Beginner", new JScrollPane(beginnerPanel));
 
-		tabbedPane.setPreferredSize(new Dimension(240, 192));
+		tabbedPane.setPreferredSize(new Dimension(256, 192));
 		scoreBoardDialog.add(tabbedPane, BorderLayout.CENTER);
 
 		scoreBoardDialog.pack();
@@ -209,10 +209,15 @@ public class SetupUI {
 	}
 
 	public static void gameReset(boolean win) {
-		if (win)
+		if (win) {
+			var score = GameManager.getPlayTime();
+			JOptionPane.showMessageDialog(mainFrame,
+					String.format("You win!\nClear Time %02dm:%02ds:%03dms", score / 1000 / 60, score / 1000 % 60, score % 1000),
+					"", JOptionPane.PLAIN_MESSAGE);
 			resetButton.setIcon(IconLoader.resetWinIcon);
-		else
+		} else {
+			JOptionPane.showMessageDialog(mainFrame, "", "You lose", JOptionPane.PLAIN_MESSAGE);
 			resetButton.setIcon(IconLoader.resetLoseIcon);
-
+		}
 	}
 }

@@ -57,6 +57,10 @@ public class GameManager {
 		return gameOver;
 	}
 
+	public static long getPlayTime() {
+		return playTime;
+	}
+
 	// 게임이 초기화되고, 최초 클릭 시 게임 시작 및 보드 구성
 	private static void initializeBoard(int excludedRow, int excludedCol) {
 		isBoardInitialized = true;
@@ -202,6 +206,8 @@ public class GameManager {
 				tile.setFound(won);
 			}
 		}
+		if (won)
+			ScoreRanking.save(playTime);
 	}
 
 	private static void onLose() {
