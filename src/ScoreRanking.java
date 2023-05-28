@@ -2,11 +2,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
+// 점수 읽기 쓰기를 실행하고, 점수 순위를 관리
 public class ScoreRanking {
+	// 난이도 별 점수 순위(오름차순)
 	private static ArrayList<Long> beginnerScores;
 	private static ArrayList<Long> intermediateScores;
 	private static ArrayList<Long> expertScores;
 
+	// 외부에서의 임의 접근을 막고, 직접 String으로 변환해 데이터 전
 	public static String[] getExpertScoresString() {
 		return getScoresStringInner(expertScores);
 	}
@@ -19,7 +22,7 @@ public class ScoreRanking {
 		return getScoresStringInner(beginnerScores);
 	}
 
-	// 점수에 문자열 포매팅으로 읽을만하게 만들기
+	// 점수를 문자열 포매팅으로 읽을만하게 만들기
 	private static String[] getScoresStringInner(ArrayList<Long> scores) {
 		var scoresString = new String[scores.size()];
 
@@ -31,6 +34,7 @@ public class ScoreRanking {
 		return scoresString;
 	}
 
+	// 점수를 읽어서 저장
 	public static void load() {
 		try {
 			// 난이도별 file에 접근해 읽기를 한다.
@@ -51,6 +55,7 @@ public class ScoreRanking {
 		}
 	}
 
+	// 새로운 점수 기록을 추가하고 순위 정리 후, 전체 기록을 파일에 저장
 	public static void save(long newScore) {
 		try {
 			// 난이도에 따라 file에 접근해 쓰기를 한다.
